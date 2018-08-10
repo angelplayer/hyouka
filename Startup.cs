@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using MediatR;
 
 namespace hyouka_api
 {
@@ -33,7 +34,7 @@ namespace hyouka_api
             services
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<HyoukaContext>();
-
+            services.AddMediatR();
 
             services
                 .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
