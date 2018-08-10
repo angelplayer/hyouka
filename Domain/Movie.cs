@@ -16,7 +16,7 @@ namespace hyouka_api.Domain
     public DateTime ReleaseDate { get; set; }
 
     [NotMapped]
-    public List<int> genreList => (MovieGenre?.Select(x => x.GenreId) ?? Enumerable.Empty<int>()).ToList();
+    public List<string> GenreList => (MovieGenre?.Select(x => x.Genre.Name) ?? Enumerable.Empty<string>()).ToList();
     [NotMapped] public int EpisodeCount => EpisodeList?.Count ?? 0;
 
     [JsonIgnore]

@@ -1,6 +1,7 @@
 
 
 using System.Threading.Tasks;
+using hyouka_api.Feature;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,12 @@ namespace hyouka_api.Feature
     public MoviesController(IMediator _mediator)
     {
       this._mediator = _mediator;
+    }
+
+    [HttpGet]
+    public async Task<MoviesEnvelope> Get()
+    {
+      return await this._mediator.Send(new List.Query());
     }
 
     [HttpPost]
