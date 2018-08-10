@@ -21,6 +21,7 @@ namespace hyouka_api.Infrastructure
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Episode> Episodes { get; set; }
+        public DbSet<MovieGenre> MovieGenre {get; set;}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionBuidler) {
             optionBuidler.UseSqlite($"Data Source={_databasename}");
