@@ -7,41 +7,44 @@ using hyouka_api.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace List
+namespace hyouka_api.Feature.Movies
 {
-  public class Query : IRequest<MoviesEnvelope>
+  public class List
   {
-    public Query() {
-
-    }
-
-    public Query(string tag)
+    public class Query : IRequest<MoviesEnvelope>
     {
-      this.Tag = tag;
-    }
-
-    public string Tag { get; set; }
-  }
-
-  public class QueryHandler : IRequestHandler<Query, MoviesEnvelope>
-  {
-    private HyoukaContext context;
-
-    public QueryHandler(HyoukaContext context)
-    {
-      this.context = context;
-    }
-
-    public async Task<MoviesEnvelope> Handle(Query message, CancellationToken cancellationToken)
-    {
-      var query = this.context.Movies.Include(x => x.MovieGenre).ThenInclude(x => x.Genre).AsNoTracking();
-      var movies = await query.ToListAsync();
-
-      return new MoviesEnvelope()
+      public Query()
       {
-        Movies = movies,
-        Count = query.Count()
-      };
+
+      }
+
+      public Query(string tag)
+      {
+        this.Tag = tag;
+      }
+
+      public string Tag { get; set; }
+    }
+
+    public class QueryHandler : IRequestHandler<Query, MoviesEnvelope>
+    {
+      private HyoukaContext context;
+
+      public QueryHandler(HyoukaContext context)
+      {
+        this.context = context;
+      }
+
+      public async Task<MoviesEnvelope> Handle(Query message, CancellationToken cancellationToken)
+      {
+        var movies = await this.context.Movies.GetAllData().ToListAsync();
+
+        return new MoviesEnvelope()
+        {
+          Movies = movies,
+          Count = movies.Count()
+        };
+      }
     }
   }
 }

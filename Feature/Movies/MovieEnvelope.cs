@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using hyouka_api.Domain;
 
-namespace hyouka_api.Feature
+namespace hyouka_api.Feature.Movies
 {
   public class MovieEnvelope
   {

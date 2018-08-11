@@ -2,10 +2,11 @@
 
 using System.Threading.Tasks;
 using hyouka_api.Feature;
+using hyouka_api.Feature.Movies;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace hyouka_api.Feature
+namespace hyouka_api.Feature.Movies
 {
   [Route("api/[controller]")]
   public class MoviesController : Controller
@@ -21,6 +22,12 @@ namespace hyouka_api.Feature
     public async Task<MoviesEnvelope> Get()
     {
       return await this._mediator.Send(new List.Query());
+    }
+
+    [HttpGet("{id}")]
+    public async Task<MovieEnvelope> Get(int id)
+    {
+      return await this._mediator.Send(new Detail.Query(id));
     }
 
     [HttpPost]

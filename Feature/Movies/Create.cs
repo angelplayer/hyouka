@@ -9,7 +9,7 @@ using hyouka_api.Infrastructure;
 using MediatR;
 using System.Linq;
 
-namespace hyouka_api.Feature
+namespace hyouka_api.Feature.Movies
 {
   public class Create
   {
