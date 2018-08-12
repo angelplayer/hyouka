@@ -19,9 +19,9 @@ namespace hyouka_api.Feature.Movies
     }
 
     [HttpGet]
-    public async Task<MoviesEnvelope> Get()
+    public async Task<MoviesEnvelope> Get([FromQuery]string tag)
     {
-      return await this._mediator.Send(new List.Query());
+      return await this._mediator.Send(new List.Query(tag));
     }
 
     [HttpGet("{id}")]

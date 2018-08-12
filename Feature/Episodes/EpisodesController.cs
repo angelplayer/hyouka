@@ -15,11 +15,23 @@ namespace hyouka_api.Controllers
       this.mediator = mediator;
     }
 
+    [HttpGet("{movieId}/episodes")]
+    public async Task<EpisodesEvelope> Get(int movieId)
+    {
+      return await this.mediator.Send(new List.Query(movieId));
+    }
+
     [HttpPost("{movieId}/episodes")]
-    public async Task<EpisodeEnvelope> Create(int movieId,[FromBody] Create.Command command)
+    public async Task<EpisodeEnvelope> Create(int movieId, [FromBody] Create.Command command)
     {
       command.MovieId = movieId;
       return await this.mediator.Send(command);
+    }
+
+    [HttpDelete("{movieId}/episodes/{id}")]
+    public async Task<Unit> Delete(int movieId, int id)
+    {
+      return await this.mediator.Send(new Delete.Command(id, movieId));
     }
   }
 }

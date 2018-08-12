@@ -56,8 +56,8 @@ namespace hyouka_api.Feature.Movies
               GenreId = x
             })
          , cancellationToken);
-        await this.context.SaveChangesAsync();
-
+        await this.context.SaveChangesAsync(cancellationToken);
+        movie.MovieGenre = null;
         return new MovieEnvelope(movie);
       }
     }

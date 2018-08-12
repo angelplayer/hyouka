@@ -19,6 +19,7 @@ namespace hyouka_api.Domain
 
     [NotMapped]
     public List<string> GenreList => (MovieGenre?.Select(x => x.Genre.Name) ?? Enumerable.Empty<string>()).ToList();
+
     [NotMapped] public int EpisodeCount => Episodes?.Count ?? 0;
 
     [JsonIgnore]

@@ -18,11 +18,11 @@ namespace hyouka_api.Feature.Movies
       }
     }
 
-    public class Handler : IRequestHandler<Query, MovieEnvelope>
+    public class QueryHandler : IRequestHandler<Query, MovieEnvelope>
     {
       private HyoukaContext context;
 
-      public Handler(HyoukaContext context)
+      public QueryHandler(HyoukaContext context)
       {
         this.context = context;
       }

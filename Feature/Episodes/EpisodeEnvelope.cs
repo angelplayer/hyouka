@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using hyouka_api.Domain;
 
 namespace hyouka_api.Feature.Episodes
@@ -10,5 +11,11 @@ namespace hyouka_api.Feature.Episodes
     {
       this.Episode = newEpi;
     }
+  }
+
+  public class EpisodesEvelope
+  {
+    public List<Episode> Episodes { get; set; }
+    public int Count => Episodes.Count;
   }
 }

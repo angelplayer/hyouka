@@ -37,8 +37,13 @@ namespace hyouka_api.Feature.Movies
 
       public async Task<MoviesEnvelope> Handle(Query message, CancellationToken cancellationToken)
       {
-        var movies = await this.context.Movies.GetAllData().ToListAsync();
+        var query = this.context.Movies.GetAllData();
+        if (!string.IsNullOrEmpty(message.Tag))
+        {
+          query = this.context.MovieGenre.Where(x => x.Genre.Name == message.Tag).Select(mg => mg.Movie).AsNoTracking();
+        }
 
+        var movies = await query.ToListAsync();
         return new MoviesEnvelope()
         {
           Movies = movies,
