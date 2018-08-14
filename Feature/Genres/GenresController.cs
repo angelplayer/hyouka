@@ -14,6 +14,7 @@ namespace hyouka_api.Feature.Genres
       this.mediator = mediator;
     }
 
+    [HttpGet]
     public async Task<GenresEnvelope> Get()
     {
       return await this.mediator.Send(new List.Query());
