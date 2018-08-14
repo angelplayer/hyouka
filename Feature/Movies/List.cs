@@ -9,47 +9,51 @@ using Microsoft.EntityFrameworkCore;
 
 namespace hyouka_api.Feature.Movies
 {
-  public class List
-  {
-    public class Query : IRequest<MoviesEnvelope>
+    public class List
     {
-      public Query()
-      {
-
-      }
-
-      public Query(string tag)
-      {
-        this.Tag = tag;
-      }
-
-      public string Tag { get; set; }
-    }
-
-    public class QueryHandler : IRequestHandler<Query, MoviesEnvelope>
-    {
-      private HyoukaContext context;
-
-      public QueryHandler(HyoukaContext context)
-      {
-        this.context = context;
-      }
-
-      public async Task<MoviesEnvelope> Handle(Query message, CancellationToken cancellationToken)
-      {
-        var query = this.context.Movies.GetAllData();
-        if (!string.IsNullOrEmpty(message.Tag))
+        public class Query : IRequest<MoviesEnvelope>
         {
-          query = this.context.MovieGenre.Where(x => x.Genre.Name == message.Tag).Select(mg => mg.Movie).AsNoTracking();
+            public Query()
+            {
+
+            }
+
+            public Query(string tag)
+            {
+                this.Tag = tag;
+            }
+
+            public string Tag { get; set; }
         }
 
-        var movies = await query.ToListAsync();
-        return new MoviesEnvelope()
+        public class QueryHandler : IRequestHandler<Query, MoviesEnvelope>
         {
-          Movies = movies,
-          Count = movies.Count()
-        };
-      }
+            private HyoukaContext context;
+
+            public QueryHandler(HyoukaContext context)
+            {
+                this.context = context;
+            }
+
+            public async Task<MoviesEnvelope> Handle(Query message, CancellationToken cancellationToken)
+            {
+                var query = this.context.Movies.GetAllData();
+                if (!string.IsNullOrEmpty(message.Tag))
+                {
+                    var genre = await this.context.MovieGenre.FirstOrDefaultAsync(x => x.Genre.Name == message.Tag);
+                    if (genre != null)
+                    {
+                        query = query.Where(x => x.MovieGenre.Select(y => y.Genre.GenreId).Contains(genre.GenreId));
+                    }
+                }
+
+                var movies = await query.ToListAsync();
+                return new MoviesEnvelope()
+                {
+                    Movies = movies,
+                    Count = movies.Count()
+                };
+            }
+        }
     }
-  }
 }

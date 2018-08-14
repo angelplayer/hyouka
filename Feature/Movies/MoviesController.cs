@@ -35,5 +35,11 @@ namespace hyouka_api.Feature.Movies
     {
       return await this._mediator.Send(command);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<Unit> delete(int id) 
+    {
+      return await this._mediator.Send(new Delete.Command(id));
+    }
   }
 }
