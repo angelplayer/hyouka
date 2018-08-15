@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using hyouka_api.Infrastructure;
+using hyouka_api.Infrastructure.security;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -62,6 +63,10 @@ namespace hyouka_api
           {
               opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
           });
+
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+            services.AddJwt();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
