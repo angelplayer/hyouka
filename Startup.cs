@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
+using AutoMapper;
 
 namespace hyouka_api
 {
@@ -33,9 +34,6 @@ namespace hyouka_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMediatR();
-
-            services.AddEntityFrameworkSqlite().AddDbContext<HyoukaContext>();
             services.AddEntityFrameworkSqlite().AddDbContext<HyoukaContext>();
             services.AddSwaggerGen(x =>
             {
@@ -57,16 +55,19 @@ namespace hyouka_api
                 x.TagActionsBy(y => y.GroupName);
             });
 
-            services
-          .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-          .AddJsonOptions(opt =>
-          {
-              opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-          });
-
+            services.AddMediatR();
+            services.AddAutoMapper(GetType().Assembly);
+            services.AddScoped<IPasswordHasher, PasswordHaser>();
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-
+            // services.AddOptions<JwtIssuerOptions>();
             services.AddJwt();
+
+            services
+            .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            .AddJsonOptions(opt =>
+            {
+                opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
