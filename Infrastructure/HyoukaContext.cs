@@ -23,6 +23,7 @@ namespace hyouka_api.Infrastructure
     public DbSet<Genre> Genres { get; set; }
     public DbSet<Episode> Episodes { get; set; }
     public DbSet<MovieGenre> MovieGenre { get; set; }
+    
     public DbSet<Person> Person { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionBuidler)
