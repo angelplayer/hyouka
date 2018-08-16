@@ -3,7 +3,9 @@
 using System.Threading.Tasks;
 using hyouka_api.Feature;
 using hyouka_api.Feature.Movies;
+using hyouka_api.Infrastructure.security;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace hyouka_api.Feature.Movies
@@ -19,6 +21,7 @@ namespace hyouka_api.Feature.Movies
     }
 
     [HttpGet]
+    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task<MoviesEnvelope> Get([FromQuery]string tag)
     {
       return await this._mediator.Send(new List.Query(tag));
@@ -37,7 +40,7 @@ namespace hyouka_api.Feature.Movies
     }
 
     [HttpDelete("{id}")]
-    public async Task<Unit> delete(int id) 
+    public async Task<Unit> delete(int id)
     {
       return await this._mediator.Send(new Delete.Command(id));
     }
