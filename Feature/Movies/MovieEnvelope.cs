@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using hyouka_api.Domain;
 
-namespace hyouka_api.Feature
+namespace hyouka_api.Feature.Movies
 {
   public class MovieEnvelope
   {
@@ -10,5 +11,11 @@ namespace hyouka_api.Feature
     }
 
     public Movie Movie { get; }
+  }
+
+  public class MoviesEnvelope
+  {
+    public List<Movie> Movies { get; set; }
+    public int Count { get; set; }
   }
 }

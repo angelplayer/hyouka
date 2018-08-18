@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using hyouka_api.Infrastructure;
 
 namespace hyoukaapi.Migrations
 {
     [DbContext(typeof(HyoukaContext))]
-    partial class HyoukaContextModelSnapshot : ModelSnapshot
+    [Migration("20180816020212_secondAuth")]
+    partial class secondAuth
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

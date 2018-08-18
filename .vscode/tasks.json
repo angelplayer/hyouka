@@ -10,6 +10,24 @@
                 "${workspaceFolder}/hyouka-api.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "fast-build",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true
+            },
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/hyouka-api.csproj",
+                "--no-restore"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }

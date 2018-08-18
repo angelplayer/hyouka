@@ -9,7 +9,7 @@ using hyouka_api.Infrastructure;
 using MediatR;
 using System.Linq;
 
-namespace hyouka_api.Feature
+namespace hyouka_api.Feature.Movies
 {
   public class Create
   {
@@ -56,8 +56,8 @@ namespace hyouka_api.Feature
               GenreId = x
             })
          , cancellationToken);
-        await this.context.SaveChangesAsync();
-
+        await this.context.SaveChangesAsync(cancellationToken);
+        movie.MovieGenre = null;
         return new MovieEnvelope(movie);
       }
     }
