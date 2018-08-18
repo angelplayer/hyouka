@@ -8,13 +8,16 @@ namespace hyouka_api.Domain
 {
   public class Movie
   {
-    [JsonIgnore]
     public int MovieId { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
     public string Image { get; set; }
     public DateTime ReleaseDate { get; set; }
+
+    [JsonIgnore]
     public DateTime CreatedAt { get; set; }
+
+    [JsonIgnore]
     public DateTime UpdatedAt { get; set; }
 
     [NotMapped]
