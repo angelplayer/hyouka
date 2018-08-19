@@ -16,11 +16,13 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using AutoMapper;
+using System.IO;
 
 namespace hyouka_api
 {
   public class Startup
   {
+    public static string WebRootPath { get; private set; }
 
     public const string DATABASE_FILE = "hyouka.db";
 
@@ -60,13 +62,13 @@ namespace hyouka_api
       services.AddAutoMapper(GetType().Assembly);
       services.AddScoped<IPasswordHasher, PasswordHaser>();
       services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-
       services
       .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
       .AddJsonOptions(opt =>
       {
         opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-      });
+      }).AddXmlDataContractSerializerFormatters();
+
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,7 +82,7 @@ namespace hyouka_api
       {
         app.UseHsts();
       }
-
+      app.UseStaticFiles();
       // app.UseHttpsRedirection();
       app.UseMvc();
       app.UseSwagger(c =>
@@ -92,6 +94,18 @@ namespace hyouka_api
       {
         x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1");
       });
+
+      WebRootPath = env.WebRootPath;
+    }
+
+    public static string MapPath(string path, string basePath = null)
+    {
+      if (string.IsNullOrEmpty(basePath))
+      {
+        basePath = Startup.WebRootPath;
+      }
+      path = path.Replace("~/", "").TrimStart('/').Replace('/', '\\');
+      return Path.Combine(basePath, path);
     }
   }
 }

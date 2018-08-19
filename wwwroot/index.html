@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+
+  <link rel="stylesheet" href="jquery-ui/themes/base/all.css" />
+  <link rel="stylesheet" href="elfinder/css/elfinder.full.css" />
+  <link rel="stylesheet" href="elfinder/css/theme.css" />
+  <link rel="stylesheet" href="elfinder/css/theme-bootstrap-libreicons-svg.css" />
+</head>
+
+<body>
+
+  <div id="elfinder"></div>
+
+  <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"></script>
+  <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.6/bootstrap.min.js">
+  </script>
+  </environment>
+  <script src="jquery-ui/jquery-ui.min.js"></script>
+  <script src="elfinder/js/elfinder.full.js"></script>
+  <script type="text/javascript">
+
+    function switchTheme(href) {
+      $('#elfinder-theme').attr('href', href);
+
+    }
+  </script>
+  <script type="text/javascript">
+    // Documentation for client options:
+    // https://github.com/Studio-42/elFinder/wiki/Client-configuration-options
+    $(document).ready(function () {
+      var myCommands = elFinder.prototype._options.commands;
+      var disabled = ['callback', 'chmod', 'editor', 'netmount', 'ping', 'search', 'zipdl', 'help']; // Not yet implemented commands in elFinder.NetCore
+      elFinder.prototype.i18.en.messages.TextArea = "Edit";
+
+      $.each(disabled, function (i, cmd) {
+        (idx = $.inArray(cmd, myCommands)) !== -1 && myCommands.splice(idx, 1);
+      });
+
+      var options = {
+        url: 'el-finder/file-system/connector', // Default (Local File System)
+        rememberLastDir: false, // Prevent elFinder saving in the Browser LocalStorage the last visited directory
+        commands: myCommands,
+        //lang: 'pt_BR', // elFinder supports UI and messages localization. Check the folder Content\elfinder\js\i18n for all available languages. Be sure to include the corresponding .js file(s) in the JavaScript bundle.
+        uiOptions: { // UI buttons available to the user
+          toolbar: [
+            ['back', 'forward'],
+            ['reload'],
+            ['home', 'up'],
+            ['mkdir', 'mkfile', 'upload'],
+            ['open', 'download'],
+            ['undo', 'redo'],
+            ['info'],
+            ['quicklook'],
+            ['copy', 'cut', 'paste'],
+            ['rm'],
+            ['duplicate', 'rename', 'edit'],
+            ['selectall', 'selectnone', 'selectinvert'],
+            ['view', 'sort']
+          ]
+        }
+
+        //lang: 'vi', // Change language
+      };
+      $('#elfinder').elfinder(options).elfinder('instance');
+    });
+  </script>
+</body>
+
+</html>
