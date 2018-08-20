@@ -4,10 +4,12 @@ using elFinder.NetCore;
 using elFinder.NetCore.Drivers.FileSystem;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace hyouka_api.Feature.FileManger
 {
 
+  [ApiExplorerSettings(IgnoreApi = true)]
   [Route("el-finder/file-system")]
   public class FileSystemController : Controller
   {
