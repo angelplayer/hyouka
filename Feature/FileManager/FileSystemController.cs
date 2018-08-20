@@ -2,12 +2,12 @@ using System;
 using System.Threading.Tasks;
 using elFinder.NetCore;
 using elFinder.NetCore.Drivers.FileSystem;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace hyouka_api.Feature.FileManger
 {
-
   [Route("el-finder/file-system")]
   public class FileSystemController : Controller
   {
