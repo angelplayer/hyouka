@@ -58,6 +58,19 @@ namespace hyouka_api
         x.TagActionsBy(y => y.GroupName);
       });
 
+      // services.AddCors(options => options.AddPolicy("AllowSpecificOrigin",
+      //       builder => builder.WithOrigins("http://localhost")));
+
+      services.AddCors();
+
+      // services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+      // {
+      //   builder.AllowAnyOrigin()
+      //            .AllowAnyMethod()
+      //            .AllowAnyHeader();
+      // }));
+
+
       services.AddMediatR();
       services.AddAutoMapper(GetType().Assembly);
       services.AddScoped<IPasswordHasher, PasswordHaser>();
@@ -68,7 +81,6 @@ namespace hyouka_api
       {
         opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
       }).AddXmlDataContractSerializerFormatters();
-
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,6 +95,10 @@ namespace hyouka_api
         app.UseHsts();
       }
       app.UseStaticFiles();
+      app.UseFileServer();
+      app.UseCors(options => options.WithOrigins("http://localhost")
+            .AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()
+            .AllowCredentials());
       // app.UseHttpsRedirection();
       app.UseMvc();
       app.UseSwagger(c =>
