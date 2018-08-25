@@ -41,38 +41,13 @@ namespace hyouka_api
     {
       services.AddJwt();
       services.AddEntityFrameworkSqlite().AddDbContext<HyoukaContext>();
-      // services.AddSwaggerGen(x =>
-      // {
-      //   x.AddSecurityDefinition("Bearer", new ApiKeyScheme
-      //   {
-      //     In = "header",
-      //     Description = "Please insert JWT with Bearer into field",
-      //     Name = "Authorization",
-      //     Type = "apiKey"
-      //   });
-      //   x.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-      //     {
-      //             { "Bearer", new string[] { } }
-      //     });
-
-      //   x.SwaggerDoc("v1", new Info { Title = "RealWorld API", Version = "v1" });
-      //   x.CustomSchemaIds(y => y.FullName);
-      //   x.DocInclusionPredicate((version, apiDescription) => true);
-      //   x.TagActionsBy(y => y.GroupName);
-      // });
-
-      // services.AddCors(options => options.AddPolicy("AllowSpecificOrigin",
-      //       builder => builder.WithOrigins("http://localhost")));
-
-      services.AddCors();
-
-      // services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
-      // {
-      //   builder.AllowAnyOrigin()
-      //            .AllowAnyMethod()
-      //            .AllowAnyHeader();
-      // }));
-
+      services.AddCors(option =>
+      {
+        option.AddPolicy("api", x =>
+        x.AllowAnyOrigin().AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials());
+      });
 
       services.AddMediatR();
       services.AddAutoMapper(GetType().Assembly);
@@ -99,20 +74,9 @@ namespace hyouka_api
       }
       app.UseStaticFiles();
       app.UseFileServer();
-      app.UseCors(options => options.WithOrigins("http://localhost")
-            .AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()
-            .AllowCredentials());
+      app.UseCors("api");
       // app.UseHttpsRedirection();
       app.UseMvc();
-      // app.UseSwagger(c =>
-      //     {
-      //       c.RouteTemplate = "swagger/{documentName}/swagger.json";
-      //     });
-      // Enable middleware to serve swagger-ui assets(HTML, JS, CSS etc.)
-      // app.UseSwaggerUI(x =>
-      // {
-      //   x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1");
-      // });
       app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly, settings =>
         {
           settings.GeneratorSettings.DefaultPropertyNameHandling =
