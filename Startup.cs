@@ -14,9 +14,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
+// using Swashbuckle.AspNetCore.Swagger;
 using AutoMapper;
 using System.IO;
+using NJsonSchema;
+using NSwag.AspNetCore;
+using System.Reflection;
 
 namespace hyouka_api
 {
@@ -38,25 +41,25 @@ namespace hyouka_api
     {
       services.AddJwt();
       services.AddEntityFrameworkSqlite().AddDbContext<HyoukaContext>();
-      services.AddSwaggerGen(x =>
-      {
-        x.AddSecurityDefinition("Bearer", new ApiKeyScheme
-        {
-          In = "header",
-          Description = "Please insert JWT with Bearer into field",
-          Name = "Authorization",
-          Type = "apiKey"
-        });
-        x.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-          {
-                  { "Bearer", new string[] { } }
-          });
+      // services.AddSwaggerGen(x =>
+      // {
+      //   x.AddSecurityDefinition("Bearer", new ApiKeyScheme
+      //   {
+      //     In = "header",
+      //     Description = "Please insert JWT with Bearer into field",
+      //     Name = "Authorization",
+      //     Type = "apiKey"
+      //   });
+      //   x.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+      //     {
+      //             { "Bearer", new string[] { } }
+      //     });
 
-        x.SwaggerDoc("v1", new Info { Title = "RealWorld API", Version = "v1" });
-        x.CustomSchemaIds(y => y.FullName);
-        x.DocInclusionPredicate((version, apiDescription) => true);
-        x.TagActionsBy(y => y.GroupName);
-      });
+      //   x.SwaggerDoc("v1", new Info { Title = "RealWorld API", Version = "v1" });
+      //   x.CustomSchemaIds(y => y.FullName);
+      //   x.DocInclusionPredicate((version, apiDescription) => true);
+      //   x.TagActionsBy(y => y.GroupName);
+      // });
 
       // services.AddCors(options => options.AddPolicy("AllowSpecificOrigin",
       //       builder => builder.WithOrigins("http://localhost")));
@@ -80,7 +83,7 @@ namespace hyouka_api
       .AddJsonOptions(opt =>
       {
         opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-      }).AddXmlDataContractSerializerFormatters();
+      });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -101,15 +104,21 @@ namespace hyouka_api
             .AllowCredentials());
       // app.UseHttpsRedirection();
       app.UseMvc();
-      app.UseSwagger(c =>
-          {
-            c.RouteTemplate = "swagger/{documentName}/swagger.json";
-          });
+      // app.UseSwagger(c =>
+      //     {
+      //       c.RouteTemplate = "swagger/{documentName}/swagger.json";
+      //     });
       // Enable middleware to serve swagger-ui assets(HTML, JS, CSS etc.)
-      app.UseSwaggerUI(x =>
-      {
-        x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1");
-      });
+      // app.UseSwaggerUI(x =>
+      // {
+      //   x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1");
+      // });
+      app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly, settings =>
+        {
+          settings.GeneratorSettings.DefaultPropertyNameHandling =
+              PropertyNameHandling.CamelCase;
+        });
+
 
       WebRootPath = env.WebRootPath;
     }

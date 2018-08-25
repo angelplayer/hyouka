@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace hyouka_api.Feature.Movies
 {
-  [Route("api/[controller]")]
+  [Route("api/movies")]
   public class MoviesController : Controller
   {
     private IMediator _mediator;
