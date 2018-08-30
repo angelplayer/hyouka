@@ -5,7 +5,7 @@ namespace hyouka_api.Feature.Genres
 {
   public class GenresEnvelope
   {
-    public List<string> Genre { get; set; }
+    public List<Genre> Genre { get; set; }
   }
 
   public class GenreEnvelope

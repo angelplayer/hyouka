@@ -12,7 +12,7 @@ using hyouka_api.Infrastructure.security;
 
 namespace hyouka_api.Feature.Users
 {
-  namespace Create
+  public class Create
   {
     public class UserData
     {

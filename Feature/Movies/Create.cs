@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace hyouka_api.Feature.Movies
 {
-  namespace Create
+  public class Create
   {
     public class MovieData
     {

@@ -29,7 +29,7 @@ namespace hyouka_api.Feature.Genres
         var genres = await this.context.Genres.OrderBy(x => x.GenreId).AsNoTracking().ToListAsync(cancellationToken);
         return new GenresEnvelope()
         {
-          Genre = genres.Select(x => x.Name).ToList()
+          Genre = genres.ToList()
         };
       }
     }
