@@ -43,12 +43,12 @@ namespace hyouka_api.Feature.Users
 
       public async Task<UserEnvelope> Handle(Command request, CancellationToken cancellationToken)
       {
-        if (await this.context.Person.Where(x => x.Username == request.User.Username).AnyAsync(cancellationToken))
+        if (await this.context.Person.Where(x => x.Username.Equals(request.User.Username)).AnyAsync(cancellationToken))
         {
           throw new RestException(HttpStatusCode.BadRequest, Constants.IN_USE);
         }
 
-        if (await this.context.Person.Where(x => x.Email == request.User.Email).AnyAsync())
+        if (await this.context.Person.Where(x => x.Email.Equals(request.User.Email)).AnyAsync())
         {
           throw new RestException(HttpStatusCode.BadRequest, Constants.IN_USE);
         }
