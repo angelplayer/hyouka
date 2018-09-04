@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace hyouka_api.Feature.Users
 {
-  [Route("api/[Controller]")]
+  [Route("api/user")]
   public class UserController : Controller
   {
     private IMediator mediator;
@@ -21,7 +21,7 @@ namespace hyouka_api.Feature.Users
       return await this.mediator.Send(command);
     }
 
-    [HttpPost]
+    [HttpPost("register")]
     public async Task<UserEnvelope> Register([FromBody] Create.Command command)
     {
       return await this.mediator.Send(command);

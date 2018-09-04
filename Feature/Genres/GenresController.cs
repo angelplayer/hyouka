@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace hyouka_api.Feature.Genres
 {
-  [Route("api/[Controller]")]
+  [Route("api/genres")]
   public class GenresController : Controller
   {
     private readonly IMediator mediator;

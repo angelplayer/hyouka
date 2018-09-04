@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace hyouka_api.Feature.Movies
 {
-  [Route("api/[controller]")]
+  [Route("api/movies")]
   public class MoviesController : Controller
   {
     private IMediator _mediator;
@@ -22,7 +22,7 @@ namespace hyouka_api.Feature.Movies
 
     [HttpGet]
     [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
-    public async Task<MoviesEnvelope> Get([FromQuery]string tag)
+    public async Task<MoviesEnvelope> Get([FromQuery]string tag = null)
     {
       return await this._mediator.Send(new List.Query(tag));
     }
