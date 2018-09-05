@@ -31,13 +31,29 @@ namespace hyouka_api
     }
   }
 
-  public class ResultEnvelope
+  public class FileActionResult
+  {
+    public bool Success { get; set; }
+    public String Error { get; set; }
+  }
+
+  public class FileResultEnvelope
   {
     public List<FileData> Resutl { get; set; }
 
-    public ResultEnvelope(List<FileData> data)
+    public FileResultEnvelope(List<FileData> data)
     {
       this.Resutl = data;
+    }
+  }
+
+  public class ActionResultEnvelope
+  {
+    public FileActionResult Result { get; set; }
+
+    public ActionResultEnvelope(FileActionResult result)
+    {
+      this.Result = result;
     }
   }
 
@@ -45,6 +61,7 @@ namespace hyouka_api
   {
     public string Action { get; set; }
     public string Path { get; set; }
+    public string NewPath { get; set; }
   }
 
   [Route("api/file")]
@@ -55,21 +72,18 @@ namespace hyouka_api
     public FileController(IMediator mediator)
     {
       this.mediator = mediator;
-
-
     }
 
     [HttpPost]
-    public async Task<ResultEnvelope> HandleAction([FromBody] ActionCommand command)
+    public async Task<ActionResultEnvelope> HandleAction([FromBody] ActionCommand command)
     {
-
-      return await this.mediator.Send(new ListActionCommand(command.Path));
+      return await this.mediator.Send(new CreateFolderCommand(command.NewPath));
     }
   }
 
 
-  // listing
-  public class ListActionCommand : IRequest<ResultEnvelope>
+  #region List file
+  public class ListActionCommand : IRequest<FileResultEnvelope>
   {
     public string Path { get; set; }
 
@@ -79,7 +93,7 @@ namespace hyouka_api
     }
   }
 
-  class QueryHandler : IRequestHandler<ListActionCommand, ResultEnvelope>
+  class QueryHandler : IRequestHandler<ListActionCommand, FileResultEnvelope>
   {
 
     private IFileProvider provider;
@@ -91,7 +105,7 @@ namespace hyouka_api
       this.env = env;
     }
 
-    public Task<ResultEnvelope> Handle(ListActionCommand request, CancellationToken cancellationToken)
+    public Task<FileResultEnvelope> Handle(ListActionCommand request, CancellationToken cancellationToken)
     {
 
       var directoryContent = this.provider.GetDirectoryContents($"/Files/{request.Path}");
@@ -106,8 +120,54 @@ namespace hyouka_api
             item.IsDirectory ? "dir" : "file", "drwxr-xr-x"));
         }
       }
-      return Task.FromResult(new ResultEnvelope(files));
+      return Task.FromResult(new FileResultEnvelope(files));
     }
   }
+  #endregion
+
+  #region Create folder
+
+  public class CreateFolderCommand : IRequest<ActionResultEnvelope>
+  {
+    public string NewPath { get; set; }
+
+    public CreateFolderCommand(string newPath)
+    {
+      this.NewPath = newPath;
+    }
+  }
+
+  class CreateFolderHandler : IRequestHandler<CreateFolderCommand, ActionResultEnvelope>
+  {
+    private IFileProvider provider;
+    private IHostingEnvironment env;
+
+    public CreateFolderHandler(IFileProvider provider, IHostingEnvironment env)
+    {
+      this.env = env;
+      this.provider = provider;
+    }
+
+    public Task<ActionResultEnvelope> Handle(CreateFolderCommand request, CancellationToken cancellationToken)
+    {
+      var path = Path.Combine(this.env.WebRootPath, "Files", request.NewPath.TrimStart(new char[] { ' ', '/' }));
+
+      if (Directory.Exists(path))
+      {
+        throw new InvalideFileOperationException("Directory is already existed");
+      }
+
+      Directory.CreateDirectory(path);
+      var result = new FileActionResult()
+      {
+        Success = true,
+        Error = null
+      };
+      return Task.FromResult(new ActionResultEnvelope(result));
+    }
+  }
+
+  #endregion
+
 
 }
