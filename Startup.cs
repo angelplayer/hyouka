@@ -20,6 +20,7 @@ using System.IO;
 using NJsonSchema;
 using NSwag.AspNetCore;
 using System.Reflection;
+using Microsoft.Extensions.FileProviders;
 
 namespace hyouka_api
 {
@@ -29,9 +30,13 @@ namespace hyouka_api
 
     public const string DATABASE_FILE = "hyouka.db";
 
-    public Startup(IConfiguration configuration)
+    private IHostingEnvironment env;
+
+
+    public Startup(IConfiguration configuration, IHostingEnvironment env)
     {
       Configuration = configuration;
+      this.env = env;
     }
 
     public IConfiguration Configuration { get; }
@@ -48,6 +53,9 @@ namespace hyouka_api
                .AllowAnyMethod()
                .AllowCredentials());
       });
+
+      var provider = env.WebRootFileProvider;
+      services.AddSingleton<IFileProvider>(provider);
 
       services.AddMediatR();
       services.AddAutoMapper(GetType().Assembly);
