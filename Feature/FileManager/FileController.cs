@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Http;
 
 namespace hyouka_api
 {
@@ -39,11 +40,11 @@ namespace hyouka_api
 
   public class FileResultEnvelope
   {
-    public List<FileData> Resutl { get; set; }
+    public List<FileData> result { get; set; }
 
     public FileResultEnvelope(List<FileData> data)
     {
-      this.Resutl = data;
+      this.result = data;
     }
   }
 
@@ -75,12 +76,17 @@ namespace hyouka_api
     }
 
     [HttpPost]
-    public async Task<ActionResultEnvelope> HandleAction([FromBody] ActionCommand command)
+    public async Task<FileResultEnvelope> HandleAction([FromBody] ActionCommand command)
     {
-      return await this.mediator.Send(new CreateFolderCommand(command.NewPath));
+      return await this.mediator.Send(new ListActionCommand(command.Path));
+    }
+
+    [HttpPost("upload")]
+    public async Task<ActionResultEnvelope> UploadAction([FromForm]FileUploadModel uploadModel)
+    {
+      return await this.mediator.Send(new UploadFileCommand(uploadModel));
     }
   }
-
 
   #region List file
   public class ListActionCommand : IRequest<FileResultEnvelope>
@@ -166,8 +172,73 @@ namespace hyouka_api
       return Task.FromResult(new ActionResultEnvelope(result));
     }
   }
-
   #endregion
 
+
+  #region Upload file
+
+
+  public class FileUploadModel
+  {
+    public string Destination { get; set; }
+    public IFormCollection Files { get; set; }
+  }
+
+
+  public class UploadFileCommand : IRequest<ActionResultEnvelope>
+  {
+    public FileUploadModel UploadModel { get; set; }
+
+    public UploadFileCommand(FileUploadModel uploadModel)
+    {
+      this.UploadModel = uploadModel;
+    }
+  }
+
+
+
+  public class UploadActionHandler : IRequestHandler<UploadFileCommand, ActionResultEnvelope>
+  {
+
+    private IFileProvider provider;
+    private IHostingEnvironment env;
+
+    public UploadActionHandler(IFileProvider provider, IHostingEnvironment env)
+    {
+      this.provider = provider;
+      this.env = env;
+    }
+
+    public async Task<ActionResultEnvelope> Handle(UploadFileCommand request, CancellationToken cancellationToken)
+    {
+      var path = Path.Combine(this.env.WebRootPath, "Files", request.UploadModel.Destination.TrimStart(new char[] { ' ', '/' }));
+      if (request.UploadModel.Files.Count > 0)
+      {
+        try
+        {
+          foreach (var item in request.UploadModel.Files.Files)
+          {
+            using (var stream = new FileStream(Path.Combine(path, item.FileName), FileMode.Create))
+            {
+              await item.CopyToAsync(stream);
+            }
+          }
+        }
+        catch (Exception ex)
+        {
+          throw new InvalideFileOperationException(ex.Message);
+        }
+      }
+      //move it to webroot content folder
+      var envelope = new ActionResultEnvelope(new FileActionResult()
+      {
+        Success = true,
+        Error = null
+      });
+
+      return envelope;
+    }
+  }
+  #endregion
 
 }
