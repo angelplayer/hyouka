@@ -11,6 +11,7 @@ using System.Threading;
 using System;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace hyouka_api
 {
@@ -72,6 +73,7 @@ namespace hyouka_api
     public string Item { get; set; }
   }
 
+
   [Route("api/file")]
   public class FileController : Controller
   {
@@ -81,6 +83,14 @@ namespace hyouka_api
     {
       this.mediator = mediator;
     }
+
+    [HttpGet]
+    public async Task<FileContentResult> download([FromQuery]string action, [FromQuery] string path)
+    {
+      //download/ preview a file
+      return await this.mediator.Send(new SingleDownloadCommnad(path));
+    }
+
     // POST: /api/file/list
     [HttpPost("list")]
     public async Task<FileResultEnvelope> Navigate([FromBody] ActionCommand command)
@@ -105,7 +115,6 @@ namespace hyouka_api
       return await this.mediator.Send(request);
     }
 
-
     // PostL /api/file/content
     [HttpPost("content")]
     public async Task<ContentEnvelope> GetContent([FromBody]ActionCommand command)
@@ -120,8 +129,69 @@ namespace hyouka_api
     {
       return await this.mediator.Send(new UploadFileCommand(uploadModel));
     }
+  }
 
+  public class SingleDownloadCommnad : IRequest<FileContentResult>
+  {
+    public string Path;
 
+    public SingleDownloadCommnad(string path)
+    {
+      this.Path = path;
+    }
+  }
+
+  public class SingleDownloadHandler : IRequestHandler<SingleDownloadCommnad, FileContentResult>
+  {
+    private IHostingEnvironment env;
+    private IFileProvider provider;
+
+    public SingleDownloadHandler(IHostingEnvironment env, IFileProvider provider)
+    {
+      this.env = env;
+      this.provider = provider;
+    }
+
+    public async Task<FileContentResult> Handle(SingleDownloadCommnad request, CancellationToken cancellationToken)
+    {
+      var path = Path.Combine(this.env.WebRootPath, "Files", request.Path.TrimStart(new char[] { ' ', '/' }));
+      FileInfo fileInfo = new FileInfo(path);
+      var memory = new MemoryStream();
+      using (var stream = fileInfo.OpenRead())
+      {
+        await stream.CopyToAsync(memory);
+      }
+      memory.Position = 0;
+      FileExtensionContentTypeProvider guest = new FileExtensionContentTypeProvider();
+      string contentType = "";
+      guest.TryGetContentType(path, out contentType);
+      return new FileContentResult(memory.ToArray(), contentType);
+    }
+
+    private string GetContentType(string path)
+    {
+      var types = GetMimeTypes();
+      var ext = Path.GetExtension(path).ToLowerInvariant();
+      return types[ext];
+    }
+
+    private Dictionary<string, string> GetMimeTypes()
+    {
+      return new Dictionary<string, string>
+            {
+                {".txt", "text/plain"},
+                {".pdf", "application/pdf"},
+                {".doc", "application/vnd.ms-word"},
+                {".docx", "application/vnd.ms-word"},
+                {".xls", "application/vnd.ms-excel"},
+                {".xlsx", "application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet"},
+                {".png", "image/png"},
+                {".jpg", "image/jpeg"},
+                {".jpeg", "image/jpeg"},
+                {".gif", "image/gif"},
+                {".csv", "text/csv"}
+            };
+    }
   }
 
 
