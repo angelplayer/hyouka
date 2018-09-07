@@ -44,6 +44,8 @@ namespace hyouka_api
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+      // loggerFactory.AddConsole();
+
       services.AddJwt();
       services.AddEntityFrameworkSqlite().AddDbContext<HyoukaContext>();
       services.AddCors(option =>
@@ -56,6 +58,9 @@ namespace hyouka_api
 
       var provider = env.WebRootFileProvider;
       services.AddSingleton<IFileProvider>(provider);
+
+      // services.AddLocalization(x => x.ResourcesPath = "Resources");
+
 
       services.AddMediatR();
       services.AddAutoMapper(GetType().Assembly);
@@ -80,6 +85,7 @@ namespace hyouka_api
       {
         app.UseHsts();
       }
+      app.UseMiddleware<ErrorHandlingMiddleware>();
       app.UseStaticFiles();
       app.UseFileServer();
       app.UseCors("api");

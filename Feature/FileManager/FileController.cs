@@ -35,7 +35,7 @@ namespace hyouka_api
   public class FileActionResult
   {
     public bool Success { get; set; }
-    public String Error { get; set; }
+    public Object Error { get; set; }
   }
 
   public class FileResultEnvelope
@@ -81,19 +81,50 @@ namespace hyouka_api
     {
       this.mediator = mediator;
     }
-
-    [HttpPost]
-    public async Task<FileResultEnvelope> HandleAction([FromBody] ActionCommand command)
+    // POST: /api/file/list
+    [HttpPost("list")]
+    public async Task<FileResultEnvelope> Navigate([FromBody] ActionCommand command)
     {
       return await this.mediator.Send(new ListActionCommand(command.Path));
     }
 
+    // POST: /api/file/command
+    [HttpPost("command")]
+    public async Task<ActionResultEnvelope> FileAction([FromBody] ActionCommand command)
+    {
+      IRequest<ActionResultEnvelope> request = null;
+
+      if ("createFolder".Equals(command.Action))
+      {
+        request = new CreateFolderCommand(command.NewPath);
+      }
+      else
+      {
+        throw new InvalideFileOperationException("command is not found");
+      }
+      return await this.mediator.Send(request);
+    }
+
+
+    // PostL /api/file/content
+    [HttpPost("content")]
+    public async Task<ContentEnvelope> GetContent([FromBody]ActionCommand command)
+    {
+      return await this.mediator.Send(new GetContentActionCommand(command.Item));
+    }
+
+
+    // POST: /api/file/upload
     [HttpPost("upload")]
-    public async Task<ActionResultEnvelope> UploadAction([FromForm]FileUploadModel uploadModel)
+    public async Task<ActionResultEnvelope> Upload([FromForm]FileUploadModel uploadModel)
     {
       return await this.mediator.Send(new UploadFileCommand(uploadModel));
     }
+
+
   }
+
+
 
   #region List file
   public class ListActionCommand : IRequest<FileResultEnvelope>
@@ -126,12 +157,14 @@ namespace hyouka_api
 
       foreach (var item in directoryContent)
       {
-        if (item.Exists)
+        if (!item.Exists)
         {
-          files.Add(
+          throw new InvalideFileOperationException("File is not exist");
+        }
+
+        files.Add(
             new FileData(item.Name, item.Length.ToString(), item.LastModified.ToString(),
             item.IsDirectory ? "dir" : "file", "drwxr-xr-x"));
-        }
       }
       return Task.FromResult(new FileResultEnvelope(files));
     }
@@ -214,7 +247,6 @@ namespace hyouka_api
     }
   }
   #endregion
-
 
   #region Upload file
   public class FileUploadModel
