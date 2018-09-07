@@ -40,11 +40,11 @@ namespace hyouka_api
 
   public class FileResultEnvelope
   {
-    public List<FileData> result { get; set; }
+    public List<FileData> Result { get; set; }
 
     public FileResultEnvelope(List<FileData> data)
     {
-      this.result = data;
+      this.Result = data;
     }
   }
 
@@ -58,11 +58,18 @@ namespace hyouka_api
     }
   }
 
+  public class ContentEnvelope
+  {
+    public string Result { get; set; }
+  }
+
+
   public class ActionCommand
   {
     public string Action { get; set; }
     public string Path { get; set; }
     public string NewPath { get; set; }
+    public string Item { get; set; }
   }
 
   [Route("api/file")]
@@ -174,10 +181,42 @@ namespace hyouka_api
   }
   #endregion
 
+  #region Read content 
+  public class GetContentActionCommand : IRequest<ContentEnvelope>
+  {
+    public string Item { get; set; }
+
+    public GetContentActionCommand(String item)
+    {
+      this.Item = item;
+    }
+  }
+
+  public class GetContentHandler : IRequestHandler<GetContentActionCommand, ContentEnvelope>
+  {
+    private IFileProvider provider;
+    private IHostingEnvironment env;
+
+    public GetContentHandler(IFileProvider provider, IHostingEnvironment env)
+    {
+      this.env = env;
+      this.provider = provider;
+    }
+
+    public async Task<ContentEnvelope> Handle(GetContentActionCommand request, CancellationToken cancellationToken)
+    {
+      var path = Path.Combine(this.env.WebRootPath, "Files", request.Item.TrimStart(new char[] { ' ', '/' }));
+      var content = await File.ReadAllTextAsync(path);
+      var envelope = new ContentEnvelope();
+      envelope.Result = content;
+
+      return envelope;
+    }
+  }
+  #endregion
+
 
   #region Upload file
-
-
   public class FileUploadModel
   {
     public string Destination { get; set; }
@@ -240,5 +279,4 @@ namespace hyouka_api
     }
   }
   #endregion
-
 }
