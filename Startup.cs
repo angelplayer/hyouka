@@ -14,13 +14,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-// using Swashbuckle.AspNetCore.Swagger;
 using AutoMapper;
 using System.IO;
 using NJsonSchema;
 using NSwag.AspNetCore;
 using System.Reflection;
 using Microsoft.Extensions.FileProviders;
+using hyouka_api.Feature.FileManger;
 
 namespace hyouka_api
 {
@@ -58,10 +58,9 @@ namespace hyouka_api
 
       var provider = env.WebRootFileProvider;
       services.AddSingleton<IFileProvider>(provider);
-
+      var pathMapper = new PathMapper(env.WebRootPath, "Files");
+      services.AddSingleton<IPathMapper>(pathMapper);
       // services.AddLocalization(x => x.ResourcesPath = "Resources");
-
-
       services.AddMediatR();
       services.AddAutoMapper(GetType().Assembly);
       services.AddScoped<IPasswordHasher, PasswordHaser>();
