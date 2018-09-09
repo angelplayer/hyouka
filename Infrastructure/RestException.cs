@@ -1,4 +1,3 @@
-
 using System;
 using System.Net;
 
@@ -11,9 +10,7 @@ namespace hyouka_api.Infrastructure
       Code = code;
       Errors = errors;
     }
-
     public object Errors { get; set; }
-
     public HttpStatusCode Code { get; }
   }
 }

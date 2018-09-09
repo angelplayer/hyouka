@@ -14,12 +14,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-// using Swashbuckle.AspNetCore.Swagger;
 using AutoMapper;
 using System.IO;
 using NJsonSchema;
 using NSwag.AspNetCore;
 using System.Reflection;
+using Microsoft.Extensions.FileProviders;
+using hyouka_api.Feature.FileManger;
 
 namespace hyouka_api
 {
@@ -29,9 +30,13 @@ namespace hyouka_api
 
     public const string DATABASE_FILE = "hyouka.db";
 
-    public Startup(IConfiguration configuration)
+    private IHostingEnvironment env;
+
+
+    public Startup(IConfiguration configuration, IHostingEnvironment env)
     {
       Configuration = configuration;
+      this.env = env;
     }
 
     public IConfiguration Configuration { get; }
@@ -39,6 +44,8 @@ namespace hyouka_api
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+      // loggerFactory.AddConsole();
+
       services.AddJwt();
       services.AddEntityFrameworkSqlite().AddDbContext<HyoukaContext>();
       services.AddCors(option =>
@@ -49,6 +56,11 @@ namespace hyouka_api
                .AllowCredentials());
       });
 
+      var provider = env.WebRootFileProvider;
+      services.AddSingleton<IFileProvider>(provider);
+      var pathMapper = new PathMapper(env.WebRootPath, "Files");
+      services.AddSingleton<IPathMapper>(pathMapper);
+      // services.AddLocalization(x => x.ResourcesPath = "Resources");
       services.AddMediatR();
       services.AddAutoMapper(GetType().Assembly);
       services.AddScoped<IPasswordHasher, PasswordHaser>();
@@ -72,6 +84,7 @@ namespace hyouka_api
       {
         app.UseHsts();
       }
+      app.UseMiddleware<ErrorHandlingMiddleware>();
       app.UseStaticFiles();
       app.UseFileServer();
       app.UseCors("api");
