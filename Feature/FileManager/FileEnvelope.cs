@@ -58,5 +58,7 @@ namespace hyouka_api.Feature.FileManger
     public string Path { get; set; }
     public string NewPath { get; set; }
     public string Item { get; set; }
+    public string newItemPath { get; set; }
+    public string[] Items { get; set; }
   }
 }

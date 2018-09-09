@@ -47,6 +47,18 @@ namespace hyouka_api.Feature.FileManger
       {
         request = new CreateFolderCommand(command.NewPath);
       }
+      else if ("rename".Equals(command.Action))
+      {
+        request = new RenameCommand(command.Item, command.newItemPath);
+      }
+      else if ("move".Equals(command.Action))
+      {
+        request = new MoveCommand(command.Items, command.NewPath);
+      }
+      else if ("remove".Equals(command.Action))
+      {
+        request = new RemoveCommand(command.Items);
+      }
       else
       {
         throw new InvalideFileOperationException("command is not found");
