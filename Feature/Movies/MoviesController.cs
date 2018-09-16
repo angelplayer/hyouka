@@ -21,7 +21,7 @@ namespace hyouka_api.Feature.Movies
     }
 
     [HttpGet]
-    [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
+    // [Authorize(AuthenticationSchemes = JwtIssuerOptions.Schemes)]
     public async Task<MoviesEnvelope> Get([FromQuery]string tag = null)
     {
       return await this._mediator.Send(new List.Query(tag));
