@@ -24,90 +24,98 @@ using hyouka_api.Feature.FileManger;
 
 namespace hyouka_api
 {
-  public class Startup
-  {
-    public static string WebRootPath { get; private set; }
-
-    public const string DATABASE_FILE = "hyouka.db";
-
-    private IHostingEnvironment env;
-
-
-    public Startup(IConfiguration configuration, IHostingEnvironment env)
+    public class Startup
     {
-      Configuration = configuration;
-      this.env = env;
-    }
+        public static string WebRootPath { get; private set; }
 
-    public IConfiguration Configuration { get; }
+        public const string DATABASE_FILE = "hyouka.db";
 
-    // This method gets called by the runtime. Use this method to add services to the container.
-    public void ConfigureServices(IServiceCollection services)
-    {
-      // loggerFactory.AddConsole();
+        private IHostingEnvironment env;
 
-      services.AddJwt();
-      services.AddEntityFrameworkSqlite().AddDbContext<HyoukaContext>();
-      services.AddCors(option =>
-      {
-        option.AddPolicy("api", x =>
-        x.AllowAnyOrigin().AllowAnyHeader()
-               .AllowAnyMethod()
-               .AllowCredentials());
-      });
 
-      var provider = env.WebRootFileProvider;
-      services.AddSingleton<IFileProvider>(provider);
-      var pathMapper = new PathMapper(env.WebRootPath, "Files");
-      services.AddSingleton<IPathMapper>(pathMapper);
-      // services.AddLocalization(x => x.ResourcesPath = "Resources");
-      services.AddMediatR();
-      services.AddAutoMapper(GetType().Assembly);
-      services.AddScoped<IPasswordHasher, PasswordHaser>();
-      services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-      services
-      .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-      .AddJsonOptions(opt =>
-      {
-        opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-      });
-    }
-
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-    {
-      if (env.IsDevelopment())
-      {
-        app.UseDeveloperExceptionPage();
-      }
-      else
-      {
-        app.UseHsts();
-      }
-      app.UseMiddleware<ErrorHandlingMiddleware>();
-      app.UseStaticFiles();
-      app.UseFileServer();
-      app.UseCors("api");
-      // app.UseHttpsRedirection();
-      app.UseMvc();
-      app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly, settings =>
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
-          settings.GeneratorSettings.DefaultPropertyNameHandling =
-              PropertyNameHandling.CamelCase;
-        });
+            Configuration = configuration;
+            this.env = env;
+        }
 
+        public IConfiguration Configuration { get; }
 
-      WebRootPath = env.WebRootPath;
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // loggerFactory.AddConsole();
+
+            services.AddJwt();
+            services.AddEntityFrameworkSqlite().AddDbContext<HyoukaContext>();
+            services.AddCors(option =>
+            {
+                option.AddPolicy("api", x =>
+          x.AllowAnyOrigin().AllowAnyHeader()
+                 .AllowAnyMethod()
+                 .AllowCredentials());
+            });
+
+            var provider = env.WebRootFileProvider;
+            services.AddSingleton<IFileProvider>(provider);
+            var pathMapper = new PathMapper(env.WebRootPath, "Files");
+            services.AddSingleton<IPathMapper>(pathMapper);
+            // services.AddLocalization(x => x.ResourcesPath = "Resources");
+            services.AddMediatR();
+            services.AddAutoMapper(GetType().Assembly);
+            services.AddScoped<IPasswordHasher, PasswordHaser>();
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+            services
+            .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            .AddJsonOptions(opt =>
+            {
+                opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            });
+
+            services.Configure<ApiBehaviorOptions>(options => { options.SuppressInferBindingSourcesForParameters = true; });
+            services.AddSwagger();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseHsts();
+            }
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseStaticFiles();
+            app.UseFileServer();
+            app.UseCors("api");
+            // app.UseHttpsRedirection();
+            app.UseMvc();
+            // app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly, settings =>
+            //   {
+            //       settings.GeneratorSettings.DefaultPropertyNameHandling =
+            //     PropertyNameHandling.CamelCase;
+            //   });
+
+            app.UseSwaggerUi3WithApiExplorer(settings =>
+            {
+                settings.GeneratorSettings.DefaultPropertyNameHandling =
+                    PropertyNameHandling.CamelCase;
+            });
+
+            WebRootPath = env.WebRootPath;
+        }
+
+        public static string MapPath(string path, string basePath = null)
+        {
+            if (string.IsNullOrEmpty(basePath))
+            {
+                basePath = Startup.WebRootPath;
+            }
+            path = path.Replace("~/", "").TrimStart('/').Replace('/', '\\');
+            return Path.Combine(basePath, path);
+        }
     }
-
-    public static string MapPath(string path, string basePath = null)
-    {
-      if (string.IsNullOrEmpty(basePath))
-      {
-        basePath = Startup.WebRootPath;
-      }
-      path = path.Replace("~/", "").TrimStart('/').Replace('/', '\\');
-      return Path.Combine(basePath, path);
-    }
-  }
 }
