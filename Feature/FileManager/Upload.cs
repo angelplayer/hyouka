@@ -16,7 +16,7 @@ namespace hyouka_api.Feature.FileManger
     public class FileUploadModel
     {
         public string Destination { get; set; }
-        public IFormFileCollection Files { get; set; }
+        public IEnumerable<IFormFile> Files { get; set; }
     }
 
 

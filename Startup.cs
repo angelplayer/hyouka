@@ -71,6 +71,8 @@ namespace hyouka_api
             {
                 opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             });
+
+            services.Configure<ApiBehaviorOptions>(options => { options.SuppressInferBindingSourcesForParameters = true; });
             services.AddSwagger();
         }
 
