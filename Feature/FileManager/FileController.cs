@@ -1,6 +1,7 @@
-using System.Collections;
+
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
@@ -77,9 +78,14 @@ namespace hyouka_api.Feature.FileManger
 
         // POST: /api/file/upload
         [HttpPost("upload")]
-        public async Task<ActionResultEnvelope> Upload([SwaggerFile]FileUploadModel uploadModel)
+        public async Task<ActionResultEnvelope> Upload([SwaggerFile] FileUploadModel model)
         {
-            return await this.mediator.Send(new UploadFileCommand(uploadModel));
+            if (model.Files == null)
+            {
+                model.Files = this.Request.Form.Files.ToList<IFormFile>();
+            }
+
+            return await this.mediator.Send(new UploadFileCommand(model));
         }
     }
 }
